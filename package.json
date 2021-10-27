@@ -1,0 +1,18 @@
+{
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon ./app.js localhost 3000"
+    },
+    "dependencies": {
+        "canvas": "^2.8.0",
+        "express": "^4.17.1",
+        "http": "^0.0.1-security",
+        "jimp": "^0.16.1",
+        "nodemon": "^2.0.13",
+        "panorama-to-cubemap": "^1.0.1",
+        "queue": "^6.0.2",
+        "three": "^0.133.1",
+        "three.equirectangular-to-cubemap": "^1.1.0"
+    }
+}
