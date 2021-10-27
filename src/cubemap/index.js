@@ -129,7 +129,7 @@ function toBase64(arr) {
 
 async function bufferToImage(buffer) {
     return new Promise((resolve) => {
-        const base64 = `data:image/png;base64,${toBase64(buffer)}`
+        const base64 = `data:image/jpeg;base64,${toBase64(buffer)}`
         loadImage(base64).then((img) => {
             return resolve(img)
         })
@@ -232,11 +232,15 @@ async function imageToSphere(data, configImage, rootFolder) {
                     }
                     let newFile = `${newFolder}/${fileText}.jpg`;
                     console.log({cropFile, newFile});
-                    q.push(async () => {
-                        let imgE = await Jimp.read(img);
-                        await imgE.crop(cropFile.px, cropFile.py, cropFile.x, cropFile.y).resize(configImage.crop_width, configImage.crop_width)
-                        await imgE.writeAsync(newFolder + `/${fileText}.jpg`)
-                        return 'SAVE_IMAGE_' + (new Date())
+                    q.push( () => {
+                         Jimp.read(img, (err,imgE)=>{
+                             imgE.crop(cropFile.px, cropFile.py, cropFile.x, cropFile.y)
+                                 .quality(100)
+                                 .resize(configImage.crop_width, configImage.crop_width)
+                                 .write(newFolder + `/${fileText}.jpg`)
+                             return 'SAVE_IMAGE_' + (new Date())
+                         });
+
                     })
                 }
                 q.start()
@@ -261,6 +265,7 @@ async function exportPreview(arrayImage, configImage, rootFolder) {
     await Promise.all(arrayImage.map(async (file) => {
         let img = await Jimp.read(file.buffer);
         if (img.getWidth() !== crop_width) await img.resize(crop_width, crop_width);
+        await img.quality(100)
         let name = file.filename;
         let first = name.replace('.jpg', '');
         if (first === "py" || first === "ny") await img.rotate(180).crop(1, 1, crop_width, crop_width)
